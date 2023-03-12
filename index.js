@@ -27,7 +27,7 @@ const connectDB = require("./backend/config/db");
 const authRoute = require("./backend/routes/auth.route");
 const apiStatus = require("./backend/Enums/apiStatus");
 
-// connectDB();
+connectDB();
 
 const app = express();
 

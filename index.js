@@ -21,10 +21,12 @@ const dotenv = require("dotenv").config();
 const colors = require("colors");
 const cors = require("cors");
 const path = require("path");
-
+const cookieParser = require("cookie-parser");
 const connectDB = require("./backend/config/db");
 // Routes
 const authRoute = require("./backend/routes/auth.route");
+const gigRoute = require("./backend/routes/gig.route");
+const userRoute = require("./backend/routes/user.route");
 const apiStatus = require("./backend/Enums/apiStatus");
 
 connectDB();
@@ -32,16 +34,22 @@ connectDB();
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
+if (process.env.NODE_ENV !== "production") {
+  app.use(
+    cors({
+      origin: ["http://localhost:5173/login", "http://192.168.117.153:5173"],
+      credentials: true,
+    })
+  );
+  // middleware
+}
 
-// app.use(
-//   cors({
-//     origin: "http://localhost:3000",
-//     credentials: true,
-//   })
-// );
-// middleware
-
+// routes
 app.use("/api/auth", authRoute);
+app.use("/api/gig", gigRoute);
+app.use("/api/user", userRoute);
+
 app.use((err, req, res, next) => {
   const errorStatus = err.status || 500;
   const errorMessage = err.message || "Something went wrong!";

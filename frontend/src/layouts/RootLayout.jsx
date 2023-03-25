@@ -1,16 +1,14 @@
 import { Link } from "react-router-dom";
+import Footer from "./Footer";
+import Navbar from "./Navbar";
 
 function RootLayout({ children }) {
   return (
-    <>
-      {/* <nav>
-        <Link to="/signup">Join</Link>
-      </nav> */}
-      <main className="max-w-5xl mx-auto">{children}</main>
-      {/* <footer className="text-white text-center bg-slate-600 py-2 mt-3">
-        All CopyRight Reserved
-      </footer> */}
-    </>
+    <div className="font-mont">
+      <Navbar></Navbar>
+      <main>{children}</main>
+      <Footer></Footer>
+    </div>
   );
 }
 

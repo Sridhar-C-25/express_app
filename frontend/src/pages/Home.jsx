@@ -18,6 +18,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
 import "swiper/css";
+import { newRequest } from "../../utils/newRequest";
 const Home = () => {
   const [token, setToken] = useState("");
   useEffect(() => {
@@ -33,6 +34,23 @@ const Home = () => {
     let data = getCookie("token");
     if (data) setToken(data);
   }, []);
+  function sendForgotToken() {
+    alert();
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify({
+        email: "codeaprogram@gmail.com",
+      }),
+      redirect: "follow",
+    };
+
+    newRequest("/auth/forgotpasswordtoken", requestOptions)
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+  }
 
   return (
     <div>
@@ -66,7 +84,10 @@ const Home = () => {
                 focusBorderColor="transparent"
               />
             </InputGroup>
-            <button className="bg-brand-700 hover:bg-brand-900  h-full px-5 rounded-md">
+            <button
+              onClick={sendForgotToken}
+              className="bg-brand-700 hover:bg-brand-900  h-full px-5 rounded-md"
+            >
               Search
             </button>
           </div>
@@ -98,6 +119,7 @@ const Home = () => {
         </AutoplaySlider>
       </section>
       <br />
+
       <div className="max-w-6xl mx-auto  mt-2">
         <Heading size="lg">Popular Course</Heading>
         <br />

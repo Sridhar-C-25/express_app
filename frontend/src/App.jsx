@@ -3,7 +3,8 @@ import { Route, Routes } from "react-router-dom";
 import LoginCard from "./pages/Login";
 import SignupCard from "./pages/signup";
 import Home from "./pages/Home";
-
+import { useEffect } from "react";
+import { newRequest } from "../utils/newRequest";
 const App = () => {
   return (
     <RootLayout>

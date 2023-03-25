@@ -2,6 +2,9 @@ const { User } = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const apiStatus = require("../Enums/apiStatus");
+const passwordToken = require("../models/passwordToken.model");
+const crypto = require("crypto-js");
+const sendEmail = require("../utils/sendEmail");
 
 const register = async (req, res, next) => {
   try {
@@ -44,6 +47,7 @@ const register = async (req, res, next) => {
     next(err);
   }
 };
+
 // @desc    Authenticate a user
 // @route   POST /api/auth/login
 // @access  Public
@@ -95,7 +99,32 @@ const login = async (req, res, next) => {
   }
 };
 
+const createForgotPasswordToken = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    console.log(req.body);
+    if (!user)
+      return res.send({
+        message: "User not found!",
+        status: apiStatus.failure,
+      });
+
+    let token = await passwordToken.findOne({ userId: user._id });
+    if (!token) {
+      token = await new passwordToken({
+        userId: user._id,
+        token: crypto.lib.WordArray.random(20),
+      }).save();
+    }
+    const link = `${process.env.WEB_BASE_URL}/forgotpassword/${user._id}/${token.token}`;
+    await sendEmail(req.body.email, "forgot password token", link);
+    res.send(link);
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   login,
   register,
+  createForgotPasswordToken,
 };

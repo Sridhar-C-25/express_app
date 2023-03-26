@@ -37,36 +37,37 @@ const register = async (req, res, next) => {
     if (userExists) {
       const link = `${process.env.WEB_BASE_URL}/verification/${userExists._id}/${userExists.vcode}`;
       if (userExists.status === "Pending") {
-        await sendVerificationEmail(req.body.email, link)
+        await sendVerificationEmail(email, link)
           .then((eres) => {
-            res.status(201).send({
-              message: "Verfication is pending!",
-              status: apiStatus.success,
-            });
+            console.log(eres, "--res");
+            // return res.send({
+            //   message: "Verfication is pending!",
+            //   status: apiStatus.success,
+            // });
           })
           .catch((err) => {
             res.send(err);
           });
       }
-      res.send({
+      return res.send({
         message: "User already exists",
         status: apiStatus.failure,
       });
     }
-
     const user = await newUser.save();
 
     const link = `${process.env.WEB_BASE_URL}/verification/${user._id}/${user.vcode}`;
 
     await sendVerificationEmail(req.body.email, link)
       .then((eres) => {
-        res.status(201).send({
+        console.log(eres);
+        return res.status(201).send({
           message: "User has been created, but verfication is pending!",
           status: apiStatus.success,
         });
       })
       .catch((err) => {
-        res.send(err);
+        res.send(err, "err");
       });
   } catch (err) {
     console.log(err);

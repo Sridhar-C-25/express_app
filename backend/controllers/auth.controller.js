@@ -116,7 +116,7 @@ const createForgotPasswordToken = async (req, res, next) => {
         token: crypto.lib.WordArray.random(20),
       }).save();
     }
-    const link = `liveapp/forgotpassword/${user._id}/${token.token}`;
+    const link = `/forgotpassword/${user._id}/${token.token}`;
     await sendEmail(req.body.email, "forgot password token", link)
       .then((eres) => {
         res.send({

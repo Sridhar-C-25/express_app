@@ -11,14 +11,17 @@ const sendEmail = async (email, subject, text) => {
       },
     });
 
-    await transporter.sendMail({
-      from: "codeaprogram@gmail.com",
-      to: email,
-      subject: subject,
-      text: text,
-    });
-
-    console.log("email sent sucessfully");
+    await transporter
+      .sendMail({
+        from: "codeaprogram@gmail.com",
+        to: email,
+        subject: subject,
+        text: text,
+      })
+      .then((res) => res)
+      .catch((err) => {
+        return err;
+      });
   } catch (error) {
     console.log(error, "email not sent");
   }

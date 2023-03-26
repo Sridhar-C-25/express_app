@@ -121,6 +121,10 @@ const createForgotPasswordToken = async (req, res, next) => {
     res.send({
       status: apiStatus.success,
       message: "Email send successfully!",
+      data: {
+        token,
+        user,
+      },
     });
   } catch (error) {
     next(error);

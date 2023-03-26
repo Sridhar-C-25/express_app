@@ -5,8 +5,7 @@ const sendEmail = async (email, subject, text) => {
   try {
     const transporter = nodemailer.createTransport(
       new Transport({
-        apiKey:
-          "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",
+        apiKey: process.env.SENDINBLUE_API_KEY,
       })
     );
     const res = await transporter.sendMail({

@@ -23,6 +23,15 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    enum: ["Pending", "Active"],
+    default: "Pending",
+  },
+  vcode: {
+    type: String,
+    unique: true,
+  },
   profileImg: {
     type: String,
     required: false,

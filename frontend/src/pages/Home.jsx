@@ -21,6 +21,7 @@ import "swiper/css";
 import { newRequest } from "../../utils/newRequest";
 const Home = () => {
   const [token, setToken] = useState("");
+
   useEffect(() => {
     function getCookie(name) {
       var pattern = RegExp(name + "=.[^;]*");
@@ -34,6 +35,7 @@ const Home = () => {
     let data = getCookie("token");
     if (data) setToken(data);
   }, []);
+
   function sendForgotToken() {
     alert();
     const requestOptions = {
@@ -42,7 +44,7 @@ const Home = () => {
         "Content-Type": "application/json",
       },
       data: JSON.stringify({
-        email: "codeaprogram@gmail.com",
+        email: "iamsmartsri@gmail.com",
       }),
       redirect: "follow",
     };

@@ -18,23 +18,30 @@ import {
 import { useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { newRequest } from "../../utils/newRequest";
+import { apiStatus } from "../../Enums/apiStatus";
+import { useNavigate, useParams } from "react-router-dom";
 
-export default function SignupCard() {
+function ForgotPassword() {
   const [showPassword, setShowPassword] = useState(false);
-  const [registerData, setRegisterData] = useState({
-    username: "",
-    email: "",
-    password: "",
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { token, userId } = useParams();
+  const navigate = useNavigate();
+  const [forgotData, setForgotData] = useState({
+    newpassword: "",
+    confirmpassword: "",
   });
   const toast = useToast();
+
   const onChange = (e) => {
     console.log(e.target.name);
-    setRegisterData({ ...registerData, [e.target.name]: e.target.value });
+    setForgotData({ ...forgotData, [e.target.name]: e.target.value });
   };
+
   const onSubmit = (e) => {
     e.preventDefault();
-    const raw = JSON.stringify(registerData);
+    const raw = JSON.stringify({ ...forgotData, token, userId });
     console.log(raw);
+
     const requestOptions = {
       method: "POST",
       headers: {
@@ -44,21 +51,27 @@ export default function SignupCard() {
       redirect: "follow",
     };
 
-    newRequest("/auth/signup", requestOptions)
+    newRequest("/auth/forgotpassword", requestOptions)
       .then((result) => {
+        console.log(result);
         if (!result.data) {
           return;
         }
         toast({
-          title: result.data.status ? "Account created!" : "Signup Failed",
+          title: result.data.status
+            ? "Password Changed Successfully"
+            : "Password Changed Failed",
           description: result.data.message,
           status: result.data.status ? "success" : "error",
           duration: 6000,
           isClosable: true,
         });
+        if (result.data.status === apiStatus.success) {
+          navigate("/");
+        }
       })
       .catch((error) => {
-        alert(JSON.stringify({ err: error }));
+        // alert(JSON.stringify({ err: error }));
         console.log("error", error.response);
       });
   };
@@ -72,26 +85,18 @@ export default function SignupCard() {
       <Stack spacing={4} mx={"auto"} maxW={"md"} px={1} w={"100%"}>
         <Stack align={"center"}>
           <Heading fontSize={"3xl"} textAlign={"center"}>
-            Sign up
+            Change Password
           </Heading>
         </Stack>
         <form onSubmit={onSubmit}>
           <Box rounded={"lg"} bg={useColorModeValue("white", "gray.700")} p={8}>
             <Stack spacing={4}>
-              <FormControl id="username" isRequired onChange={onChange}>
-                <FormLabel>Username</FormLabel>
-                <Input type="text" name="username" />
-              </FormControl>
-              <FormControl id="email" onChange={onChange} isRequired>
-                <FormLabel>Email address</FormLabel>
-                <Input type="email" name="email" />
-              </FormControl>
-              <FormControl id="password" onChange={onChange} isRequired>
-                <FormLabel>Password</FormLabel>
+              <FormControl id="newpassword" isRequired onChange={onChange}>
+                <FormLabel>New Password</FormLabel>
                 <InputGroup>
                   <Input
+                    name="newpassword"
                     type={showPassword ? "text" : "password"}
-                    name="password"
                   />
                   <InputRightElement h={"full"}>
                     <Button
@@ -105,30 +110,41 @@ export default function SignupCard() {
                   </InputRightElement>
                 </InputGroup>
               </FormControl>
+              <FormControl id="confirmpassword" isRequired onChange={onChange}>
+                <FormLabel>Confirm Password</FormLabel>
+                <InputGroup>
+                  <Input
+                    pattern={forgotData.newpassword}
+                    name="confirmpassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                  />
+                  <InputRightElement h={"full"}>
+                    <Button
+                      variant={"ghost"}
+                      onClick={() =>
+                        setShowConfirmPassword(
+                          (showConfirmPassword) => !showConfirmPassword
+                        )
+                      }
+                    >
+                      {showConfirmPassword ? <ViewIcon /> : <ViewOffIcon />}
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+              </FormControl>
               <Stack spacing={10} pt={2}>
                 <Button
+                  type="submit"
                   loadingText="Submitting"
                   size="lg"
                   bg={"brand.700"}
-                  type="submit"
                   color={"white"}
                   _hover={{
                     bg: "brand.800",
                   }}
                 >
-                  Sign up
+                  Change Password
                 </Button>
-              </Stack>
-              <Text fontSize={"sm"} color={"gray.600"}>
-                By joining I agree to receive emails from simplylearn.
-              </Text>
-              <Stack pt={6}>
-                <Text align={"center"}>
-                  Already a user?{" "}
-                  <Link href="/login" color={"brand.700"}>
-                    Login
-                  </Link>
-                </Text>
               </Stack>
             </Stack>
           </Box>
@@ -137,3 +153,5 @@ export default function SignupCard() {
     </Flex>
   );
 }
+
+export default ForgotPassword;

@@ -5,6 +5,7 @@ const apiStatus = require("../Enums/apiStatus");
 const passwordToken = require("../models/passwordToken.model");
 const crypto = require("crypto-js");
 const sendEmail = require("../utils/sendEmail");
+const sendVerificationEmail = require("../utils/email/verificationEmail");
 
 const register = async (req, res, next) => {
   try {
@@ -13,9 +14,12 @@ const register = async (req, res, next) => {
     const { email, password } = req.body;
 
     const hash = bcrypt.hashSync(password, 5);
+    const vcode = crypto.lib.WordArray.random(6);
+
     const newUser = new User({
       ...req.body,
       password: hash,
+      vcode,
     });
 
     await newUser.validate().then(
@@ -31,23 +35,73 @@ const register = async (req, res, next) => {
     const userExists = await User.findOne({ email });
 
     if (userExists) {
+      const link = `${process.env.WEB_BASE_URL}/verification/${userExists._id}/${userExists.vcode}`;
+      await sendVerificationEmail(req.body.email, link)
+        .then((eres) => {
+          res.status(201).send({
+            message: "Verfication is pending!",
+            status: apiStatus.success,
+          });
+        })
+        .catch((err) => {
+          res.send(err);
+        });
       res.send({
         message: "User already exists",
         status: apiStatus.failure,
       });
     }
 
-    await newUser.save();
-    res.status(201).send({
-      message: "User has been created.",
-      status: apiStatus.success,
-    });
+    const user = await newUser.save();
+
+    const link = `${process.env.WEB_BASE_URL}/verification/${user._id}/${user.vcode}`;
+
+    await sendVerificationEmail(req.body.email, link)
+      .then((eres) => {
+        res.status(201).send({
+          message: "User has been created, but verfication is pending!",
+          status: apiStatus.success,
+        });
+      })
+      .catch((err) => {
+        res.send(err);
+      });
   } catch (err) {
     console.log(err);
     next(err);
   }
 };
 
+const verifyAccount = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.body.userId);
+
+    if (!user)
+      return res.send({
+        status: apiStatus.failure,
+        message: "user not found!",
+      });
+
+    const match = user.vcode == req.body.vcode;
+
+    if (!match) {
+      res.send({
+        status: apiStatus.failure,
+        message: "Verfication failed",
+      });
+    }
+
+    user.status = "Active";
+    await user.save();
+
+    res.send({
+      status: apiStatus.success,
+      message: "Verfication Successfully!",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 // @desc    Authenticate a user
 // @route   POST /api/auth/login
 // @access  Public
@@ -75,6 +129,13 @@ const login = async (req, res, next) => {
         message: "Wrong password or username!",
         status: apiStatus.failure,
       });
+
+    if (user.status != "Active") {
+      return res.send({
+        status: apiStatus.failure,
+        message: "Pending Account. Please Verify Your Email!",
+      });
+    }
 
     const token = jwt.sign(
       {
@@ -123,13 +184,6 @@ const createForgotPasswordToken = async (req, res, next) => {
         res.send({
           status: apiStatus.success,
           message: "Email send successfully!",
-          data: {
-            link,
-            token,
-            user,
-            eres,
-            user: process.env.USER_EMAIL_ID,
-          },
         });
       })
       .catch((err) => {
@@ -139,8 +193,42 @@ const createForgotPasswordToken = async (req, res, next) => {
     next(error);
   }
 };
+
+const forgotPassword = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.body.userId);
+    if (!user)
+      return res.send({
+        status: apiStatus.failure,
+        message: "user not found!",
+      });
+
+    const token = await passwordToken.findOne({
+      userId: user._id,
+      token: req.body.token,
+    });
+    if (!token)
+      return res.send({
+        status: apiStatus.failure,
+        message: "Invalid link or expired",
+      });
+    const hash = bcrypt.hashSync(req.body.newpassword, 5);
+    user.password = hash;
+    await user.save();
+    await passwordToken.deleteOne({ _id: token._id });
+
+    res.send({
+      status: apiStatus.success,
+      message: "Password reset sucessfully.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   login,
   register,
   createForgotPasswordToken,
+  forgotPassword,
+  verifyAccount,
 };

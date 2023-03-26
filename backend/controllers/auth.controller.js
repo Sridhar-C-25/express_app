@@ -117,6 +117,7 @@ const createForgotPasswordToken = async (req, res, next) => {
       }).save();
     }
     const link = `/forgotpassword/${user._id}/${token.token}`;
+    console.log(link);
     await sendEmail(req.body.email, "forgot password token", link)
       .then((eres) => {
         res.send({

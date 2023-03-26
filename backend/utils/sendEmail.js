@@ -2,20 +2,15 @@ const nodemailer = require("nodemailer");
 
 const sendEmail = async (email, subject, text) => {
   try {
-    // const transporter = nodemailer.createTransport({
-    //   service: "gmail",
-    //   secure: process.env.NODE_ENV === "production",
-    //   auth: {
-    //     user: process.env.USER_EMAIL_ID,
-    //     pass: process.env.USER_EMAIL_PASS,
-    //   },
-    // });
     const transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
+      service: "gmail",
+      secure: process.env.NODE_ENV === "production",
       auth: {
-        user: "oleta.bins@ethereal.email",
-        pass: "RJnSsAeYv3KFAuKTmE",
+        user: process.env.USER_EMAIL_ID,
+        pass: process.env.USER_EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: process.env.NODE_ENV === "production",
       },
     });
     const res = await transporter.sendMail({
@@ -24,6 +19,7 @@ const sendEmail = async (email, subject, text) => {
       subject: subject,
       text: text,
     });
+    console.log(res);
     return res;
   } catch (error) {
     console.log(error, "email not sent");

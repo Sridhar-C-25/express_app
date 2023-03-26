@@ -36,16 +36,18 @@ const register = async (req, res, next) => {
 
     if (userExists) {
       const link = `${process.env.WEB_BASE_URL}/verification/${userExists._id}/${userExists.vcode}`;
-      await sendVerificationEmail(req.body.email, link)
-        .then((eres) => {
-          res.status(201).send({
-            message: "Verfication is pending!",
-            status: apiStatus.success,
+      if (userExists.status === "Pending") {
+        await sendVerificationEmail(req.body.email, link)
+          .then((eres) => {
+            res.status(201).send({
+              message: "Verfication is pending!",
+              status: apiStatus.success,
+            });
+          })
+          .catch((err) => {
+            res.send(err);
           });
-        })
-        .catch((err) => {
-          res.send(err);
-        });
+      }
       res.send({
         message: "User already exists",
         status: apiStatus.failure,

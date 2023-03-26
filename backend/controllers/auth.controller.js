@@ -117,7 +117,7 @@ const createForgotPasswordToken = async (req, res, next) => {
       }).save();
     }
     const link = `${process.env.WEB_BASE_URL}/forgotpassword/${user._id}/${token.token}`;
-    await sendEmail(req.body.email, "forgot password token", link);
+    // await sendEmail(req.body.email, "forgot password token", link);
     res.send({
       status: apiStatus.success,
       message: "Email send successfully!",

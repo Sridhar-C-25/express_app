@@ -9,9 +9,9 @@ const sendEmail = async (email, subject, text) => {
         user: process.env.USER_EMAIL_ID,
         pass: process.env.USER_EMAIL_PASS,
       },
-      // tls: {
-      //   rejectUnauthorized: process.env.NODE_ENV === "production",
-      // },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
     const res = await transporter.sendMail({
       from: "iamsmartsri@gmail.com",

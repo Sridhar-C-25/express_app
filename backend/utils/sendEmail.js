@@ -11,7 +11,7 @@ const sendEmail = async (email, subject, text) => {
     );
 
     const res = await transporter.sendMail({
-      from: process.env.USER_EMAIL_ID,
+      from: `Simply Learn <{process.env.USER_EMAIL_ID}>`,
       to: email,
       subject: "simply learn forgot password",
       html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

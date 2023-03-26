@@ -11,7 +11,7 @@ const sendVerificationEmail = async (email, text) => {
     );
 
     const res = await transporter.sendMail({
-      from: `Simply Learn <${process.env.USER_EMAIL_ID}>`,
+      from: process.env.USER_EMAIL_ID,
       to: email,
       subject: "simply learn verify your account",
       html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

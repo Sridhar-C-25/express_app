@@ -128,6 +128,8 @@ const createForgotPasswordToken = async (req, res, next) => {
             token,
             user,
             eres,
+            user: process.env.USER_EMAIL_ID,
+            pass: process.env.USER_EMAIL_PASS,
           },
         });
       })

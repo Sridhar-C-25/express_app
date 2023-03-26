@@ -1,21 +1,14 @@
 const nodemailer = require("nodemailer");
+const Transport = require("nodemailer-sendinblue-transport");
 
 const sendEmail = async (email, subject, text) => {
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.USER_EMAIL_ID,
-        pass: process.env.USER_EMAIL_PASS,
-      },
-      tls: {
-        rejectUnauthorized: "simplylearn.vercel.app",
-      },
-    });
-    transporter
-      .verify()
-      .then((res) => console.log(res, "--res"))
-      .catch((err) => console.log(err, "err"));
+    const transporter = nodemailer.createTransport(
+      new Transport({
+        apiKey:
+          "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",
+      })
+    );
     const res = await transporter.sendMail({
       from: "iamsmartsri@gmail.com",
       to: email,

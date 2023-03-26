@@ -3,11 +3,13 @@ const Transport = require("nodemailer-sendinblue-transport");
 
 const sendEmail = async (email, subject, text) => {
   try {
+    console.log(process.env.SENDINBLUE_API_KEY);
     const transporter = nodemailer.createTransport(
       new Transport({
         apiKey: process.env.SENDINBLUE_API_KEY,
       })
     );
+
     const res = await transporter.sendMail({
       from: "iamsmartsri@gmail.com",
       to: email,

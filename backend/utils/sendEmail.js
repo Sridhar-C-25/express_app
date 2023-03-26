@@ -11,19 +11,16 @@ const sendEmail = async (email, subject, text) => {
       },
     });
 
-    await transporter
-      .sendMail({
-        from: "codeaprogram@gmail.com",
-        to: email,
-        subject: subject,
-        text: text,
-      })
-      .then((res) => res)
-      .catch((err) => {
-        return err;
-      });
+    const res = await transporter.sendMail({
+      from: "codeaprogram@gmail.com",
+      to: email,
+      subject: subject,
+      text: text,
+    });
+    return res;
   } catch (error) {
     console.log(error, "email not sent");
+    return error;
   }
 };
 

@@ -147,17 +147,12 @@ const login = async (req, res, next) => {
       process.env.JWT_KEY
     );
     const { password, ...info } = user._doc;
-    res
-      .cookie("token", token, {
-        httpOnly: false,
-      })
-      .status(200)
-      .send({
-        message: "login successful!",
-        status: apiStatus.success,
-        data: info,
-        token,
-      });
+    res.cookie("token", token).status(200).send({
+      message: "login successful!",
+      status: apiStatus.success,
+      data: info,
+      token,
+    });
   } catch (err) {
     next(err);
   }
